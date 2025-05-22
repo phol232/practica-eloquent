@@ -1,46 +1,41 @@
+{{-- resources/views/layouts/app.blade.php --}}
 <!DOCTYPE html>
-<html lang="es">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>@yield('title', 'Mi Aplicación')</title>
-  <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@yield('title', config('app.name', 'Laravel'))</title>
+
+    {{-- Vite para Tailwind CSS y JS --}}
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    @stack('styles')
 </head>
-<body>
-  {{-- Barra de navegación opcional --}}
-  <nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <div class="container">
-      <a class="navbar-brand" href="{{ route('cursos.index') }}">Inicio</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav">
-          <li class="nav-item">
-            <a class="nav-link" href="{{ route('cursos.index') }}">Cursos</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="{{ route('cursos.create') }}">Nuevo Curso</a>
-          </li>
-        </ul>
-      </div>
+<body class="font-sans antialiased bg-gray-50 text-gray-800">
+    <div class="flex flex-col min-h-screen">
+        @include('layouts.partials.header')
+
+        <main class="flex-grow container mx-auto px-4 py-8">
+            {{-- Mensajes de sesión (éxito/error) --}}
+            @if (session('success_message'))
+                <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4" role="alert">
+                    <p class="font-bold">Éxito</p>
+                    <p>{{ session('success_message') }}</p>
+                </div>
+            @endif
+            @if (session('error_message'))
+                <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4" role="alert">
+                    <p class="font-bold">Error</p>
+                    <p>{{ session('error_message') }}</p>
+                </div>
+            @endif
+            {{-- El layout que proveíste ya tenía un mensaje de 'success', lo adapté --}}
+
+            @yield('content')
+        </main>
+
+        @include('layouts.partials.footer')
     </div>
-  </nav>
-
-  <div class="container mt-4">
-    {{-- Mensajes de éxito --}}
-    @if(session('success'))
-      <div class="alert alert-success">
-        {{ session('success') }}
-      </div>
-    @endif
-
-    {{-- Contenido principal --}}
-    @yield('content')
-  </div>
-
-  <!-- Bootstrap JS Bundle -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    @stack('scripts')
 </body>
 </html>
