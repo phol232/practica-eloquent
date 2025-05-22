@@ -16,9 +16,8 @@ class ContactoController extends Controller
         return view('contacto.index');
     }
 
-    /* ---------- Procesa el envío ---------- */
     public function store(Request $request)
-    {
+{
         /* 1. Validación de datos */
         $datos = $request->validate([
             'nombre'  => 'required|min:3',
@@ -26,23 +25,25 @@ class ContactoController extends Controller
             'mensaje' => 'required|min:10',
         ]);
 
-        /* 2. Guardar en la tabla contact_messages */
-        ContactMessage::create($datos);
+        try {
+            /* 2. Guardar en la tabla contact_messages */
+            ContactMessage::create($datos);
 
-        /* 3. Correo interno al equipo de soporte */
-        // Ajusta este correo al que uses para tu Mailtrap o tu destinatario real
-        Mail::to('soporte@uc.edu')
-            ->send(new ContactanosMailable($datos));
+            /* 3. Correo interno al equipo de soporte */
+            Mail::to('soporte@uc.edu')
+                ->send(new ContactanosMailable($datos));
 
-        /* 4. Acuse de recibo al remitente */
-        Mail::to($datos['email'])
-            ->send(new ConfirmacionMailable($datos));
+            /* 4. Acuse de recibo al remitente */
+            Mail::to($datos['email'])
+                ->send(new ConfirmacionMailable($datos));
 
-        /* 5. Mensaje flash de éxito */
-        return back()->with(
-            'success',
-            '¡Mensaje enviado y confirmación enviada a tu correo!'
-        );
+            /* 5. Mensaje flash de éxito */
+            return back()->with('success', '¡Mensaje enviado y confirmación enviada a tu correo!');
+        } catch (\Exception $e) {
+            // Registrar el error y mostrar un mensaje al usuario
+            \Log::error('Error al enviar correo: ' . $e->getMessage());
+            return back()->withInput()->with('error', 'Hubo un problema al enviar el mensaje: ' . $e->getMessage());
+        }
     }
 
     /* ---------- Bandeja de entrada ---------- */

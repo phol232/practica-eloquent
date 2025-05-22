@@ -22,9 +22,8 @@ class ContactanosMailable extends Mailable
     {
         $this->datos = [
             'nombre' => $mailData['nombre'],
-            'email' => $mailData['correo'], 
+            'email' => $mailData['email'], 
             'mensaje' => $mailData['mensaje'],
-            'asunto' => $mailData['asunto']
         ];
     }
 
@@ -36,7 +35,7 @@ class ContactanosMailable extends Mailable
     public function build()
     {
         return $this
-            ->subject($this->datos['asunto'])
+            ->subject('Nuevo mensaje de contacto') 
             ->view('emails.contactanos')
             ->with('datos', $this->datos);
     }
